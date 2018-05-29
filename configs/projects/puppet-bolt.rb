@@ -62,6 +62,7 @@ project "puppet-bolt" do |proj|
   proj.component 'rubygem-winrm-fs'
   proj.component 'rubygem-rubyzip'
   proj.component 'rubygem-CFPropertyList'
+  proj.component 'rubygem-semantic_puppet'
   proj.component 'bolt'
 
   proj.directory proj.prefix
