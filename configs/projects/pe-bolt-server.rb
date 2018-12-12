@@ -4,11 +4,19 @@ project "pe-bolt-server" do |proj|
   # We can just have the same version as bolt, and use tags for specific packages
   proj.version_from_git
 
+  services = {"bolt-service" => "bolt", "plan-executor" => "plan"}
+
+  services.each do |service, short|
+    proj.setting("#{short}_sysconfdir".to_sym,
+                 "/etc/puppetlabs/#{service}/conf.d")
+    proj.setting("#{short}_logdir".to_sym,
+                 "/var/log/puppetlabs/#{service}")
+    proj.setting("#{short}_rundir".to_sym,
+                 "/var/run/puppetlabs/#{service}")
+  end
+
   proj.setting(:prefix, "/opt/puppetlabs/server/apps/bolt-server")
   proj.setting(:pe_bolt_user, "pe-bolt-server")
-  proj.setting(:sysconfdir, "/etc/puppetlabs/bolt-server/conf.d")
-  proj.setting(:logdir, "/var/log/puppetlabs/bolt-server")
-  proj.setting(:rundir, "/var/run/puppetlabs/bolt-server")
   proj.setting(:bindir, "#{proj.prefix}/bin")
   proj.setting(:libdir, "#{proj.prefix}/lib")
   proj.setting(:homedir, "/opt/puppetlabs/server/data/bolt-server")
@@ -45,7 +53,10 @@ project "pe-bolt-server" do |proj|
 
   proj.directory proj.prefix
   proj.directory proj.homedir
-  proj.directory proj.sysconfdir
-  proj.directory proj.logdir
-  proj.directory proj.rundir
+
+  services.each do |_, short|
+    proj.directory proj.send("#{short}_sysconfdir")
+    proj.directory proj.send("#{short}_logdir")
+    proj.directory proj.send("#{short}_rundir")
+  end
 end
