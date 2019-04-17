@@ -4,7 +4,7 @@ project "pe-bolt-server" do |proj|
   # We can just have the same version as bolt, and use tags for specific packages
   proj.version_from_git
 
-  services = {"bolt-server" => "bolt", "plan-executor" => "plan"}
+  services = {"bolt-server" => "bolt"}
 
   services.each do |service, short|
     proj.setting("#{short}_sysconfdir".to_sym,

@@ -13,7 +13,6 @@ component "pe-bolt-services" do |pkg, settings, platform|
   end
 
   pkg.install_file('config/transport_service_config.rb', "#{settings[:prefix]}/config/transport_service_config.rb")
-  pkg.install_file('config/plan_executor_config.rb', "#{settings[:prefix]}/config/plan_executor_config.rb")
 
   case platform.servicetype
   when "systemd"
@@ -22,10 +21,6 @@ component "pe-bolt-services" do |pkg, settings, platform|
     pkg.install_service "../pe-bolt-server.service", nil, "pe-bolt-server"
     pkg.install_configfile "../pe-bolt-server.logrotate", "/etc/logrotate.d/pe-bolt-server"
 
-    pkg.add_source("file://resources/systemd/pe-plan-executor.service", sum: "4e9dcef15e682ff8a014d9f302da918a")
-    pkg.add_source("file://resources/systemd/pe-plan-executor.logrotate", sum: "32955ab713783650a515ec96ecbab51a")
-    pkg.install_service "../pe-plan-executor.service", nil, "pe-plan-executor"
-    pkg.install_configfile "../pe-plan-executor.logrotate", "/etc/logrotate.d/pe-plan-executor"
     pkg.add_postinstall_action ["install"], ["systemctl daemon-reload"]
   when "sysv"
     if platform.is_rpm?
@@ -34,12 +29,6 @@ component "pe-bolt-services" do |pkg, settings, platform|
       pkg.add_source("file://resources/redhat/pe-bolt-server.logrotate", sum: "47740a40b4c22b7d6129c51f03d14c96")
       pkg.install_service "../pe-bolt-server.init", "../pe-bolt-server.sysconfig", "pe-bolt-server"
       pkg.install_configfile "../pe-bolt-server.logrotate", "/etc/logrotate.d/pe-bolt-server"
-
-      pkg.add_source("file://resources/redhat/pe-plan-executor.init", sum: "30901f70cea4e979fb6cc928cb05090a")
-      pkg.add_source("file://resources/redhat/pe-plan-executor.sysconfig", sum: "b9ceca7286d4b82f677abd3584a2ee5e")
-      pkg.add_source("file://resources/redhat/pe-plan-executor.logrotate", sum: "70de9b844fcb4384e20067ae2ce2fba5")
-      pkg.install_service "../pe-plan-executor.init", "../pe-plan-executor.sysconfig", "pe-plan-executor"
-      pkg.install_configfile "../pe-plan-executor.logrotate", "/etc/logrotate.d/pe-plan-executor"
     else
       fail "This OS is not supported. See https://puppet.com/docs/pe/latest/supported_operating_systems.html#puppet-master-platforms for supported platforms"
     end
