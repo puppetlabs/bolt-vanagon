@@ -19,8 +19,8 @@ component "bolt" do |pkg, settings, platform|
 
   if platform.is_windows?
     # PowerShell Module
-    pkg.add_source("file://resources/files/windows/PuppetBolt/PuppetBolt.psd1", sum: "f21e2bcfcb64da273e561e6066dce949")
-    pkg.add_source("file://resources/files/windows/PuppetBolt/PuppetBolt.psm1", sum: "1ed17a54fd4df1032ea8d96c047ac623")
+    pkg.add_source("file://resources/files/windows/PuppetBolt/PuppetBolt.psd1")
+    pkg.add_source("file://resources/files/windows/PuppetBolt/PuppetBolt.psm1")
 
     pkg.directory "#{settings[:datadir]}/PowerShell/Modules/PuppetBolt"
     pkg.install_file "../PuppetBolt.psd1", "#{settings[:datadir]}/PowerShell/Modules/PuppetBolt/PuppetBolt.psd1"
