@@ -1,4 +1,6 @@
 # Bolt Vanagon Project
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fpuppetlabs%2Fbolt-vanagon.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fpuppetlabs%2Fbolt-vanagon?ref=badge_shield)
+
 
 This project uses [vanagon](https://github.com/puppetlabs/vanagon) to generate
 installable packages for Puppet [Bolt](https://github.com/puppetlabs/bolt).
@@ -36,3 +38,7 @@ bundle exec build puppet-bolt el-7-x86_64
 ```
 
 If the packaging works, it will place a package in the `output/` folder.
+
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fpuppetlabs%2Fbolt-vanagon.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fpuppetlabs%2Fbolt-vanagon?ref=badge_large)
