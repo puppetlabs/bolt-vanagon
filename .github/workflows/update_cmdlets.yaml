@@ -1,0 +1,53 @@
+name: Update Powershell Cmdlets
+
+on:
+  repository_dispatch:
+    types: ['update-cmdlets']
+
+jobs:
+  update:
+    name: Update Powershell Cmdlets
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Bolt repository
+        uses: actions/checkout@v2
+        with:
+          repository: puppetlabs/bolt
+          path: ./bolt
+
+      - name: Checkout bolt-vanagon repository
+        uses: actions/checkout@v2
+        with:
+          path: ./bolt-vanagon
+
+      - name: Setup Ruby
+        uses: actions/setup-ruby@v1
+        working-directory: ./bolt
+        with:
+          ruby-version: 2.5.x
+
+      - name: Install bundler
+        working-directory: ./bolt
+        run: |
+          gem install bundler
+          bundle config path vendor/bundle
+
+      - name: Install gems
+        working-directory: ./bolt
+        run: bundle install --jobs 4 --retry 3
+
+      - name: Generate cmdlets
+        working-directory: ./bolt
+        run: bundle exec rake pwsh:generate
+
+      - name: Move generated module to bolt-vanagon
+        run: mv ./bolt/pwsh_module/pwsh_bolt.psm1 ./bolt-vanagon/resources/files/windows/PuppetBolt/PuppetBolt.psm1
+
+      - name: Commit and push cmdlets
+        uses: github-actions-x/commit@v2.6
+        working-directory: ./bolt-vanagon
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          push-branch: master
+          commit-message: Update powershell cmdlets module for ${{ github.event.client_payload.sha }}
+          files: resources/files/windows/PuppetBolt/PuppetBolt.psm1
