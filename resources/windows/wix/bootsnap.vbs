@@ -150,5 +150,9 @@ Function RunRubyCommand(command)
 End Function
 
 Function RunBootsnap()
-  ExtractTarballs = RunRubyCommand("bundle exec bootsnap precompile --cache-dir /home/james/puppetlabs/etc/pdk --gemfile lib/")
+  Dim BOLT_BASEDIR
+  Dim cmd
+  BOLT_BASEDIR = fso.GetFolder(InstallDir).ShortPath
+  cmd = "bootsnap precompile '" + BOLT_BASEDIR + "' --cache-dir c:/ProgramData/Puppetlabs/bolt"
+  ExtractTarballs = RunRubyCommand(cmd)
 End Function
