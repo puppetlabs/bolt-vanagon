@@ -75,7 +75,7 @@ Function ExecuteCommand(Command)
   If exitCode <> 0 Then
     Log "Execution Failed With Code: " & exitCode, True
     ExecuteCommand = False
-  else
+  Else
     ExecuteCommand = True
   End If
 End Function
@@ -90,7 +90,7 @@ Function GetRubyDirectory(RootDirectory)
     Dim RubyMinorVersion : RubyMinorVersion = arrRubyVersion(0) + "." + arrRubyVersion(1) + ".0"
     Dim GemFolderPath : GemFolderPath = RubyVerSubfolder.Path + "\lib\ruby\gems\" + RubyMinorVersion + "\gems"
 
-    if fso.FolderExists(GemFolderPath) Then
+    If fso.FolderExists(GemFolderPath) Then
       Dim FoundPDK : FoundPDK = false
       For Each GemFolder in fso.GetFolder(GemFolderPath).SubFolders
         FoundPDK = FoundPDK OR Left(GemFolder.Name,4) = "pdk-"
@@ -140,7 +140,7 @@ Function RunRubyCommand(command)
 
   ' Note Returning values back to the MSI Engine only works with Binary type Custom Actions
   ' if ExecuteCommand("""" & RubyPath & """ -S -- """ & ExtractScript & """") Then
-  if ExecuteCommand(command) Then
+  If ExecuteCommand(command) Then
     Log "Completed with success", false
     RunRubyCommand = IDOK
   Else
@@ -149,10 +149,49 @@ Function RunRubyCommand(command)
   End If
 End Function
 
+' Test whether a Folder is writeable by the current user by trying to write to
+' it and catching the error if it can't.
+Function FolderWriteable(FolderPath)
+  Dim FilePath
+  FilePath = fso.BuildPath(FolderPath, "TestWriteAccess.tmp")
+
+  ' Try to create a tmp file, and if that doesn't exit 0 return false
+  fso.CreateTextFile(FilePath).Write ("Test Folder Access")
+
+  ' Visual Basic Script doesn't have a way to 'catch' errors, but does have a
+  ' global Err object that contains the result of the last operation
+  ' performed. Check to see if that is 0, and return False if it's not.
+  ' https://stackoverflow.com/a/157785/2708055
+  If Err.Number <> 0 Then
+    FolderWriteable = False
+  Else
+    ' Cleanup temp file
+    fso.DeleteFile(FilePath)
+    ' If this hasn't errored, the folder is writeable
+    FolderWriteable = True
+  End If
+End Function
+
 Function RunBootsnap()
   Dim BOLT_BASEDIR
+  Dim BOLT_PROGRAMDATA
   Dim cmd
   BOLT_BASEDIR = fso.GetFolder(InstallDir).ShortPath
-  cmd = "bootsnap precompile '" + BOLT_BASEDIR + "' --cache-dir c:/ProgramData/Puppetlabs/bolt"
-  ExtractTarballs = RunRubyCommand(cmd)
+  BOLT_PROGRAMDATA = wshShell.ExpandEnvironmentStrings("%PROGRAMDATA%\PuppetLabs\Bolt")
+
+  ' If the ProgramData folder for Bolt does not exist create it
+  If Not(fso.FolderExists(BOLT_PROGRAMDATA)) Then
+    Log "Creating Bolt ProgramData folder", false
+    ' Create the Folders, one at a time
+    fso.CreateFolder(wshShell.ExpandEnvironmentStrings("%PROGRAMDATA%\PuppetLabs"))
+    fso.CreateFolder(BOLT_PROGRAMDATA)
+  End If
+
+  If Not(FolderWriteable(BOLT_PROGRAMDATA)) Then
+    Log "Bolt ProgramData folder " + BOLT_PROGRAMDATA + " is not writeable: " + Err.Description, true
+    RunBootsnap = IDABORT
+  Else
+    cmd = "bootsnap precompile '" + BOLT_BASEDIR + "' --cache-dir '" + BOLT_PROGRAMDATA
+    RunBootsnap = RunRubyCommand(cmd)
+  End If
 End Function
