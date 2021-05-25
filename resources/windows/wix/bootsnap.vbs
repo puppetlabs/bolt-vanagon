@@ -75,7 +75,7 @@ Function ExecuteCommand(Command)
   If exitCode <> 0 Then
     Log "Execution Failed With Code: " & exitCode, True
     ExecuteCommand = False
-  else
+  Else
     ExecuteCommand = True
   End If
 End Function
@@ -90,7 +90,7 @@ Function GetRubyDirectory(RootDirectory)
     Dim RubyMinorVersion : RubyMinorVersion = arrRubyVersion(0) + "." + arrRubyVersion(1) + ".0"
     Dim GemFolderPath : GemFolderPath = RubyVerSubfolder.Path + "\lib\ruby\gems\" + RubyMinorVersion + "\gems"
 
-    if fso.FolderExists(GemFolderPath) Then
+    If fso.FolderExists(GemFolderPath) Then
       Dim FoundPDK : FoundPDK = false
       For Each GemFolder in fso.GetFolder(GemFolderPath).SubFolders
         FoundPDK = FoundPDK OR Left(GemFolder.Name,4) = "pdk-"
@@ -140,7 +140,7 @@ Function RunRubyCommand(command)
 
   ' Note Returning values back to the MSI Engine only works with Binary type Custom Actions
   ' if ExecuteCommand("""" & RubyPath & """ -S -- """ & ExtractScript & """") Then
-  if ExecuteCommand(command) Then
+  If ExecuteCommand(command) Then
     Log "Completed with success", false
     RunRubyCommand = IDOK
   Else
@@ -151,8 +151,11 @@ End Function
 
 Function RunBootsnap()
   Dim BOLT_BASEDIR
+  Dim BOLT_PROGRAMDATA
   Dim cmd
   BOLT_BASEDIR = fso.GetFolder(InstallDir).ShortPath
-  cmd = "bootsnap precompile '" + BOLT_BASEDIR + "' --cache-dir c:/ProgramData/Puppetlabs/bolt"
-  ExtractTarballs = RunRubyCommand(cmd)
+  BOLT_PROGRAMDATA = wshShell.ExpandEnvironmentStrings("%PROGRAMDATA%\PuppetLabs\bolt")
+
+  cmd = "bootsnap precompile '" + BOLT_BASEDIR + "' --cache-dir '" + BOLT_PROGRAMDATA
+  RunBootsnap = RunRubyCommand(cmd)
 End Function
