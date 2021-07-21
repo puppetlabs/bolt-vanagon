@@ -17,14 +17,6 @@
           <%= @platform.generate_service_bin_dirs(self.get_services, self) %>
           </Directory>
         </Directory>
-
-        <Directory Id="PowerShellDir" Name="WindowsPowerShell">
-          <Directory Id="PowerShellModuleDir" Name="Modules">
-            <Directory Id="PowerShellBoltModuleDir" Name="PuppetBolt">
-              <Directory Id="PowerShellBoltModuleHelpDir" Name="en-US" />
-            </Directory>
-          </Directory>
-        </Directory>
       </Directory>
     </DirectoryRef>
   </Fragment>
