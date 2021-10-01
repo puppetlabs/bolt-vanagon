@@ -1,0 +1,26 @@
+---
+name: Snyk scan
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    types: [opened, reopened, edited, synchronize]
+
+jobs:
+ snyk_vanagon:
+   runs-on: ubuntu-latest
+   steps:
+    - name: Checkout the current PR
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+        persist-credentials: false
+    - name: Run Snyk scan on Gemfile from vanagon
+      uses: puppetlabs/security-snyk-vanagon-action@v1.0.0
+      with:
+        snykToken: ${{ secrets.SNYK_TOKEN }}
+        snykOrg: 'puppet-foss'
+    - name: Check output
+      if: steps.scan.outputs.vulns != ''
+      run: echo "Vulnerabilities detected; ${{ steps.scan.outputs.vulns }}" && exit 1
