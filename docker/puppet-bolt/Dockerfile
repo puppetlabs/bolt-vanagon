@@ -1,4 +1,4 @@
-FROM ubuntu:18.04
+FROM ubuntu:impish-20211015
 
 ARG version="1.24.0"
 ARG vcs_ref
