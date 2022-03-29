@@ -11,38 +11,34 @@ jobs:
  snyk_vanagon:
    runs-on: ubuntu-latest
    steps:
+    - name: Connect to Twingate
+      uses: twingate/github-action@v1
+      with:
+        service-key: ${{ secrets.TWINGATE_PUBLIC_REPO_KEY }}
     - name: checkout the current PR
       uses: actions/checkout@v2
       with:
         fetch-depth: 0
         persist-credentials: false
     - name: Run Vanagon Snyk Scan - push
-      uses: puppetlabs/security-snyk-vanagon-action@v2.2.0
+      uses: puppetlabs/security-snyk-vanagon-action@v3
       if: github.event_name == 'push'
       with:
         snykToken: ${{ secrets.SNYK_PE_TOKEN }}
         snykOrg: 'puppet-bolt'
         skipProjects: ''
         skipPlatforms: ''
-        urlsToReplace: 'artifactory.delivery.puppetlabs.net,%s/xart,builds.delivery.puppetlabs.net,%s/xbuild'
-        newHost: 'localhost'
-        rproxyUser: '${{ secrets.SEC_RPROXY_USER }}'
-        rproxyKey: '${{ secrets.SEC_RPROXY_KEY }}'
         sshKey: '${{ secrets.SECBOT_SSH_KEY }}'
         sshKeyName: 'id_ed25519'
         branch : ${{ github.ref_name }}
     - name: Run Vanagon Snyk Scan - PR
-      uses: puppetlabs/security-snyk-vanagon-action@v2.2.0
+      uses: puppetlabs/security-snyk-vanagon-action@v3
       if: github.event_name != 'push'
       with:
         snykToken: ${{ secrets.SNYK_PE_TOKEN }}
         snykOrg: 'puppet-bolt'
         skipProjects: ''
         skipPlatforms: ''
-        urlsToReplace: 'artifactory.delivery.puppetlabs.net,%s/xart,builds.delivery.puppetlabs.net,%s/xbuild'
-        newHost: 'localhost'
-        rproxyUser: '${{ secrets.SEC_RPROXY_USER }}'
-        rproxyKey: '${{ secrets.SEC_RPROXY_KEY }}'
         sshKey: '${{ secrets.SECBOT_SSH_KEY }}'
         sshKeyName: 'id_ed25519'
         branch : ${{ github.ref_name }}
