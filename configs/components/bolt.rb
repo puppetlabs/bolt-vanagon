@@ -40,6 +40,8 @@ component "bolt" do |pkg, settings, platform|
       pkg.install_file "resources/bolt_bash_completion.sh", "/etc/bash_completion.d/bolt.sh", mode: "0644"
     end
 
+    pkg.requires 'git' if platform.is_linux?
+
     if platform.is_macos?
       pkg.add_source 'file://resources/files/paths.d/50-bolt', sum: '4abf75aebbbfbbefc4fe0173c57ed0b2'
       pkg.install_file('../50-bolt', '/etc/paths.d/50-bolt')
