@@ -68,6 +68,15 @@ project "puppet-bolt" do |proj|
     proj.package_override("# Disable the removal of la files, they are still required\n%global __brp_remove_la_files \%{nil}")
   end
 
+  if (platform.is_el? && platform.os_version.to_i >= 8)
+    # workaround that disables __debug_package as it causes errors building el-8-aarch64 which is an internal vanagon issue
+    proj.package_override <<~DEBUG_PACKAGE
+      # Disable __debug_package (pdk.rb override)
+      %undefine __debug_package
+    DEBUG_PACKAGE
+  end 
+
+
   if platform.name =~ /^el-(8)-.*/
     # Disable build-id generation since it's currently generating conflicts
     # with system libgcc and libstdc++
